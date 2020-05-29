@@ -1,0 +1,93 @@
+{% extends 'base1.html' %}
+{% block content %}
+
+<div style="padding-top:100px;" class="container">
+<center style="border:0.5px solid #dadada; border-radius: 10px">
+  <p style="padding-top: 5px">Please upload a <b>.txt</b> file to obtain its summary</p>
+<form id="summaryform" method="post" action="{% url 'upload' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input style="border: 1px solid #0086FF;padding:5px;border-radius: 8px;width: 250px" type="file" name="inputfile" accept=".txt" required><br>
+    <p style="padding-top:7px">Enter percentage of text to retain:</p>
+    <input class="form-control" type="number" min="20" max="100" style="width:200px;" name="perc" placeholder="percentage" required><br>
+    <button id="formbutton" class="btn btn-primary" type="submit">Upload File</button>
+  </form>
+  <hr>
+  <form id="summaryform2" method="post" action="{% url 'upload2' %}">
+    {% csrf_token %}
+    <p style="padding-top:7px">Alternatively, you can use the smaple file as used in the submitted PDF:</p>
+    <input class="form-control" type="number" min="20" max="100" style="width:200px;" name="perc2" placeholder="percentage" required><br>
+    <button id="formbutton2" class="btn btn-primary" type="submit">Use Sample File</button>
+  </form>
+</center>
+<div id="resultTop" style="padding-top: 15px"></div>
+<div id="result" style="border: 0.5px solid #c5c5c5;padding:5px;border-radius:10px;display:none"></div>
+<br><br><br><br>
+
+<script>
+$("#summaryform").submit(function(e) {
+e.preventDefault();
+
+$("#formbutton").html("<span class='spinner-border text-light spinner-border-sm' role='status' aria-hidden='true'></span>&nbsp;&nbsp; Getting Summary");
+$("#formbutton").css("disabled","true");
+
+$.ajax({
+url:$("#summaryform").attr('action'),
+data:new FormData(this),
+type:'post',
+contentType: false, 
+processData: false,
+dataType: 'json',
+success: function(response){
+$("#resultTop").html("<h4>Summary:</h4>");
+$("#result").css("display","block");
+$("#result").html("<p>"+response.summary+"</p>");
+$("#formbutton").html("Upload File");
+$("#formbutton").css("disabled","false");
+$('html, body').animate({
+        scrollTop: $("#result").offset().top
+    }, 1000);
+},
+error: function (textStatus, errorThrown) {
+$("#formbutton").html("Upload File");  
+alert("Please make sure you are connected to the internet");  
+}
+})
+
+});
+</script>
+<script>
+$("#summaryform2").submit(function(e) {
+e.preventDefault();
+
+$("#formbutton2").html("<span class='spinner-border text-light spinner-border-sm' role='status' aria-hidden='true'></span>&nbsp;&nbsp; Getting Summary");
+$("#formbutton2").css("disabled","true");
+
+$.ajax({
+url:$("#summaryform2").attr('action'),
+data:new FormData(this),
+type:'post',
+contentType: false, 
+processData: false,
+dataType: 'json',
+success: function(response){
+$("#resultTop").html("<h4>Summary:</h4>");
+$("#result").css("display","block");
+$("#result").html("<p>"+response.summary+"</p>");
+$("#formbutton2").html("Use Sample File");
+$("#formbutton2").css("disabled","false");
+$('html, body').animate({
+        scrollTop: $("#result").offset().top
+    }, 1000);
+},
+error: function (textStatus, errorThrown) {
+$("#formbutton2").html("Use Sample File");  
+alert("Please make sure you are connected to the internet");  
+}
+})
+
+});
+</script>
+</div>
+
+
+{% endblock %}
